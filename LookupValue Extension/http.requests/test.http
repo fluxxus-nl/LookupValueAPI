@@ -1,4 +1,4 @@
-@baseurl = http://d365bc21:7048/BC
+@baseurl = http://d365bc22:7048/BC
 @username = Lucas
 @password = Workshop4you!
 
@@ -23,6 +23,9 @@ get {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValue
 Authorization: Basic {{username}}:{{password}}
 
 ##### Create new lookup value ################################################
+# @name lookupValue
+@newlookupvalueid = {{lookupValue.response.body.id}}
+
 post {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValues?tenant=default
 Authorization: Basic {{username}}:{{password}}
 Content-Type: application/json
@@ -33,15 +36,24 @@ Content-Type: application/json
 }
 
 #### Delete lookup value #####################################################
-delete {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValues(id-of-lookupvalue-to-be-deleted)?tenant=default
+delete {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValues({{newlookupvalueid}})?tenant=default
 Authorization: Basic {{username}}:{{password}}
 
 ##### Modify lookup value ################################################
-patch {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValues(id-of-lookupvalue-to-be-modified)?tenant=default
+patch {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValues({{newlookupvalueid}})?tenant=default
 Authorization: Basic {{username}}:{{password}}
 Content-Type: application/json
-If-Match: etag-of-lookupvalue-to-be-modified
+If-Match: *
 
 {
     "displayName": "New description"
+}
+
+###############################################################
+# Copy lookup valuie
+post {{baseurl}}/api/fluxxus/automation/v1.0/companies({{companyid}})/lookupValues({{newlookupvalueid}})/Microsoft.NAV.copy
+Authorization: Basic {{username}}:{{password}}
+Content-Type: application/json
+
+{
 }

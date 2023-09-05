@@ -149,6 +149,29 @@ codeunit 81090 "LookupValue APIV1"
         VerifyNoNewLookupValueInDatabase(TempLookupValue);
     end;
 
+    [Test]
+    procedure CopyLookupValue()
+    // [FEATURE] LookupValue UT API
+    var
+        LookupValue: Record LookupValue;
+        Response: Text;
+    begin
+        // [SCENARIO #0300] Copy lookup value
+
+        // [GIVEN] Committed lookup value
+        CreateCommittedLookupValue(LookupValue);
+
+        // [WHEN] Send POST request to copy lookup value 
+        Response := SendPostRequestToCopyLookupValue(LookupValue);
+
+        // [THEN] No content 204 response
+        // is checked in SendPostRequestToCopyLookupValue
+        // [THEN] Empty response
+        VerifyEmptyResponse(Response);
+        // [THEN] Copied lookup value in database
+        VerifyCopiedLookupValueInDatabase(LookupValue, Response);
+    end;
+
     local procedure CreateCommittedLookupValue(var LookupValue: Record LookupValue)
     var
         LibraryLookupValue: Codeunit "Library - Lookup Value";
@@ -209,9 +232,19 @@ codeunit 81090 "LookupValue APIV1"
         LibraryGraphMgt.PostToWebService(CreateTargetURL(''), RequestBody, Response);
     end;
 
+    local procedure SendPostRequestToCopyLookupValue(LookupValue: Record LookupValue) Response: Text
+    begin
+        LibraryGraphMgt.PostToWebServiceAndCheckResponseCode(CreateTargetURLWithSubpage(LookupValue.SystemId), '', Response, 204);
+    end;
+
     local procedure CreateTargetURL(ID: Text): Text
     begin
         exit(LibraryGraphMgt.CreateTargetURL(ID, Page::"Lookup Values APIV1", 'lookupValues'));
+    end;
+
+    local procedure CreateTargetURLWithSubpage(ID: Text): Text
+    begin
+        exit(LibraryGraphMgt.CreateTargetURLWithSubpage(ID, Page::"Lookup Values APIV1", 'lookupValues', 'Microsoft.NAV.copy'));
     end;
 
     local procedure VerifyEmptyResponse(Response: Text)
@@ -255,5 +288,12 @@ codeunit 81090 "LookupValue APIV1"
     begin
         LookupValue.SetRange(Code, LookupValue.Code);
         Assert.RecordIsEmpty(LookupValue);
+    end;
+
+    local procedure VerifyCopiedLookupValueInDatabase(LookupValue: Record LookupValue; Response: Text)
+    begin
+        LookupValue.SetFilter(Code, '<>%1', LookupValue.Code);
+        LookupValue.SetRange(Description, LookupValue.Description);
+        Assert.RecordIsNotEmpty(LookupValue);
     end;
 }

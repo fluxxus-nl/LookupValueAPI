@@ -100,4 +100,14 @@ page 50090 "Lookup Values APIV1"
         TempFieldSet.Validate("No.", FieldNo);
         TempFieldSet.Insert(true);
     end;
+
+    [ServiceEnabled]
+    procedure Copy()
+    var
+        LookupValue: Record LookupValue;
+    begin
+        LookupValue := Rec;
+        LookupValue.Code := Format(Random(1000)); // Oops ;-)
+        LookupValue.Insert();
+    end;
 }

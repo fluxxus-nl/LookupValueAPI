@@ -41,4 +41,12 @@ Feature 'LookupValue UT API' {
         Then 'Empty response'
         Then 'No new lookup value in database' 
     }
+
+    Scenario 0300 'Copy lookup value' {
+        Given 'Committed lookup value'
+        When 'Send POST request to copy lookup value '
+        Then 'No content 204 response'
+        Then 'Empty response'
+        Then 'Copied lookup value in database' 
+    }       
 }
